@@ -1,22 +1,25 @@
-#include <SPI.h>
-#include "Adafruit_MAX6675.h"
+#include "max6675.h"
 
-#define CLK 13
-#define CS 10
-#define DO 12
+int SO_PIN = 4;  
+int CS_PIN = 5;  
+int SCK_PIN = 6; 
 
-Adafruit_MAX6675 thermocouple(CLK, CS, DO);
+MAX6675 thermocouple(SCK_PIN, CS_PIN, SO_PIN);
 
-void setup(){
-  Serial.begin(115200);
-  delay(1000);
-  Serial.print("Start...");
+void setup() {
+  Serial.begin(9600);
+  delay(500);
 }
-void loop(){
-  float tempurature = thermocouple.readCelsius();
-  Serial.print("Tempurature: ");
-  Serial.print(tempurature);
-  Serial.println("C");
+
+void loop() {
+  //Celcuis
+  Serial.print("Temperature: ");
+  Serial.print(thermocouple.readCelsius());
+  Serial.print("C ");
+
+  //Fahrenheit
+  Serial.print(thermocouple.readFahrenheit());
+  Serial.println("F ");
 
   delay(1000);
 }
