@@ -1,21 +1,32 @@
 #include <Adafruit_NeoPixel.h>
 
 #define DO_PIN 6
-#define NUMPIXELS 200
+#define NUMPIXELS 300
 
 #define PROX_SENSOR_1 4
 #define PROX_SENSOR_2 5
 
 Adafruit_NeoPixel strip(NUMPIXELS, DO_PIN, NEO_GRB + NEO_KHZ800);
 
-const int segmentLength = 5;
+const int segmentLength = 20;
 int position = 0;
-int direction = 1;
+int colorIndex = 0;
+
+uint32_t colors[] = {
+  strip.Color(255, 0, 0),     // Red
+  strip.Color(255, 128, 0),   // Orange
+  strip.Color(0, 255, 0),     // Green
+  strip.Color(0, 0, 255)      // Blue
+};
+
+const int numColors = sizeof(colors) / sizeof(colors[0]);
 
 void setup() {
   Serial.begin(9600);
+
   pinMode(PROX_SENSOR_1, INPUT);
   pinMode(PROX_SENSOR_2, INPUT);
+
   strip.begin();
   strip.setBrightness(200);
   strip.clear();
@@ -27,35 +38,32 @@ void loop() {
   int sensor2 = digitalRead(PROX_SENSOR_2);
 
   if (sensor1 == HIGH || sensor2 == HIGH) {
-    animatedSnake();
+    colorAnimation();
   } else {
     strip.clear();
     strip.show();
   }
 }
 
-void animatedSnake() {
+void colorAnimation() {
   strip.clear();
 
   for (int i = 0; i < segmentLength; i++) {
     int pixelIndex = (position + i) % NUMPIXELS;
-
-    // Pulsing brightness using sine wave
-    float brightness = 0.6 + 0.4 * sin((millis() / 100.0) + i);
-
-    // Use HSV for a rainbow gradient with slight hue shift per pixel
-    int hue = (millis() / 5 + i * 20) % 65536;
-    uint32_t color = strip.gamma32(strip.ColorHSV(hue, 255, 255 * brightness));
-
-    strip.setPixelColor(pixelIndex, color);
+    strip.setPixelColor(pixelIndex, colors[colorIndex]);
   }
 
   strip.show();
-  delay(30);
+  delay(20);
 
-  // Move snake with bounce effect
-  position += direction;
-  if (position <= 0 || position >= NUMPIXELS - segmentLength) {
-    direction *= -1;
+  
+  position++;
+
+  if (position >= NUMPIXELS) {
+    position = 0;
+    colorIndex++;
+    if (colorIndex >= numColors) {
+      colorIndex = 0;
+    }
   }
 }
