@@ -24,7 +24,7 @@ int dy = 0;
 int getPixelIndex(int x, int y) {
   if (y % 2 == 0) {
     return y * 8 + x;
-} else {  //y % 2 != 0
+  } else {  //y % 2 != 0
     return y * 8 + (7 - x);
   }
 }
@@ -59,10 +59,29 @@ void spawnPoint() {
 }
 
 void placeFood() {
-}
+  int foodx, foody;
+  bool valid = false;
 
-void collision() {
+  while (!valid) {
+    foodx = random(0, 8);
+    foody = random(0, 8);
+
+    valid = true;
+
+    for (int i = 0; i < snakeLenght; i++) {
+      if (foodx == snake[i].x && foody == snake[i].y) {
+        valid = false;
+        break;
+      }
+    }
+  }
+
+  int foodIndex = getPixelIndex(foodx, foody);
+  strip.setPixelColor(foodIndex, strip.Color(255, 255, 0));
+  strip.show();
 }
+// void collision() {
+// }
 
 // void Left_Button(){
 
@@ -72,7 +91,7 @@ void collision() {
 
 // }
 
-// void button_function(){
+// void button_function(){  ???
 
 // }
 
