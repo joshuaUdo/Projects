@@ -21,6 +21,10 @@ int snakeLenght = 3;
 int dx = 1;
 int dy = 0;
 
+int foodX, foodY;
+unsigned long lastFoodTime;
+const unsigned long foodDuration = 5000;
+
 int getPixelIndex(int x, int y) {
   if (y % 2 == 0) {
     return y * 8 + x;
@@ -47,7 +51,11 @@ void moveSnake() {
   for (int i = 0; i < snakeLenght; i++) {
     int index = getPixelIndex(snake[i].x, snake[i].y);
     strip.setPixelColor(index, strip.Color(0, 255, 0));
+
+    int foodIndex = getPixelIndex(foodX, foodY);
+    strip.setPixelColor(foodIndex, strip.Color(255, 255, 0));
   }
+
 
   strip.show();
 }
@@ -75,8 +83,11 @@ void placeFood() {
       }
     }
   }
+  foodX = foodx;
+  foodY = foody;
+  lastFoodTime = millis();
 
-  int foodIndex = getPixelIndex(foodx, foody);
+  int foodIndex = getPixelIndex(foodX, foody);
   strip.setPixelColor(foodIndex, strip.Color(255, 255, 0));
   strip.show();
 }
@@ -104,7 +115,7 @@ void setup() {
 
   strip.begin();
   strip.clear();
-  strip.setBrightness(100);
+  strip.setBrightness(50);
   strip.show();
 
   spawnPoint();
@@ -116,5 +127,9 @@ void loop() {
   if (now - lastmove >= moveinterval) {
     moveSnake();
     lastmove = now;
+  }
+
+  if (millis() - lastFoodTime >= foodDuration) {
+    placeFood();
   }
 }
