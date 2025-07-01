@@ -7,8 +7,14 @@
 
 Adafruit_NeoPixel strip(PIXELS, DISPLAY, NEO_GRB + NEO_KHZ800);
 
+bool gameOver = false;
+
 unsigned long lastmove = 0;
-const int moveinterval = 400;
+const int moveinterval = 500;
+
+unsigned long lastLeftPress = 0;
+unsigned long lastRightPress = 0;
+const unsigned long debounceDelay = 500;
 
 struct Point {
   int x;
@@ -23,7 +29,7 @@ int dy = 0;
 
 int foodX, foodY;
 unsigned long lastFoodTime;
-const unsigned long foodDuration = 5000;
+const unsigned long foodDuration = 8000;
 
 int getPixelIndex(int x, int y) {
   if (y % 2 == 0) {
@@ -100,13 +106,13 @@ void eatFood() {
 }
 
 void collision() {
+  if (gameOver) return;
+
   for (int i = 1; i < snakeLength; i++) {
     if (snake[i].x == snake[0].x && snake[i].y == snake[0].y) {
       drawExplosionAt(snake[0].x, snake[0].y);
-      delay(1000);
-      spawnPoint();
-      snakeLength = 3;
-      break;
+      gameOver = true;
+      return;
     }
   }
 }
@@ -133,7 +139,6 @@ void drawExplosionAt(int centerX, int centerY) {
   }
 }
 
-
 void Left_Button() {
   if (dx == 1 && dy == 0) {
     dx = 0;
@@ -155,6 +160,7 @@ void Left_Button() {
     dy = 0;
   }
 }
+
 void Right_Button() {
   if (dx == 1 && dy == 0) {
     dx = 0;
@@ -176,8 +182,6 @@ void Right_Button() {
     dy = 0;
   }
 }
-// void button_function(){}
-
 
 void setup() {
   // put your setup code here, to run once:
@@ -196,24 +200,36 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
   unsigned long now = millis();
-  if (now - lastmove >= moveinterval) {
+
+  if (!gameOver && now - lastmove >= moveinterval) {
     moveSnake();
     collision();
     lastmove = now;
   }
 
-  if (digitalRead(LEFT) == LOW) {
-    Left_Button();
-    delay(50);
-  }
-
-  if (digitalRead(RIGHT) == LOW) {
-    Right_Button();
-    delay(50);
-  }
-
-  if (millis() - lastFoodTime >= foodDuration) {
+  if (gameOver && digitalRead(LEFT) == LOW) {
+    spawnPoint();
+    snakeLength = 3;
     placeFood();
+    gameOver = false;
+    delay(300);
   }
-  eatFood();
+
+  if (!gameOver) {
+    if (digitalRead(LEFT) == LOW && (now - lastLeftPress > debounceDelay)) {
+      Left_Button();
+      lastLeftPress = now;
+    }
+
+    if (digitalRead(RIGHT) == LOW && (now - lastRightPress > debounceDelay)) {
+      Right_Button();
+      lastRightPress = now;
+    }
+
+    if (millis() - lastFoodTime >= foodDuration) {
+      placeFood();
+    }
+
+    eatFood();
+  }
 }
