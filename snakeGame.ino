@@ -51,10 +51,10 @@ void moveSnake() {
   for (int i = 0; i < snakeLength; i++) {
     int index = getPixelIndex(snake[i].x, snake[i].y);
     strip.setPixelColor(index, strip.Color(0, 255, 0));
-
-    int foodIndex = getPixelIndex(foodX, foodY);
-    strip.setPixelColor(foodIndex, strip.Color(255, 255, 0));
   }
+
+  int foodIndex = getPixelIndex(foodX, foodY);
+  strip.setPixelColor(foodIndex, strip.Color(255, 255, 0));
 
   strip.show();
 }
@@ -99,29 +99,19 @@ void eatFood() {
   }
 }
 
-Point food;
-
 void collision() {
-  for (int i = 1; i < snakeLength - 1; i++) {
+  for (int i = 1; i < snakeLength; i++) {
     if (snake[i].x == snake[0].x && snake[i].y == snake[0].y) {
-      drawExplosion(snake[0].x, snake[0].y);
+      drawExplosionAt(snake[0].x, snake[0].y);
       delay(1000);
       spawnPoint();
       snakeLength = 3;
       break;
     }
   }
-  // Check for collision with food
-  if (snake[0].x == food.x && snake[0].y == food.y) {
-    snakeLength++;  // Increase snake length
-    if (snakeLength > PIXELS) {
-      snakeLength = PIXELS;
-    }
-    Serial.println(snakeLength);
-    placeFood();  // Place new food
-  }
 }
-void drawExplosion(int centerX, int centerY) {
+
+void drawExplosionAt(int centerX, int centerY) {
   strip.clear();
 
   for (int radius = 0; radius <= 4; radius++) {
@@ -140,12 +130,11 @@ void drawExplosion(int centerX, int centerY) {
 
     strip.show();
     delay(120);
-    strip.clear();
   }
 }
 
+
 void Left_Button() {
-  //If moving right, turn up
   if (dx == 1 && dy == 0) {
     dx = 0;
     dy = -1;
@@ -166,9 +155,7 @@ void Left_Button() {
     dy = 0;
   }
 }
-
 void Right_Button() {
-  // If moving right, turn down
   if (dx == 1 && dy == 0) {
     dx = 0;
     dy = 1;
@@ -189,6 +176,8 @@ void Right_Button() {
     dy = 0;
   }
 }
+// void button_function(){}
+
 
 void setup() {
   // put your setup code here, to run once:
@@ -213,21 +202,18 @@ void loop() {
     lastmove = now;
   }
 
+  if (digitalRead(LEFT) == LOW) {
+    Left_Button();
+    delay(50);
+  }
+
+  if (digitalRead(RIGHT) == LOW) {
+    Right_Button();
+    delay(50);
+  }
+
   if (millis() - lastFoodTime >= foodDuration) {
     placeFood();
   }
   eatFood();
-
-  int buttonState = digitalRead(LEFT);
-
-  int button2State = digitalRead(RIGHT);
-  if (buttonState == 0) {
-    Serial.println("LEFT");
-    delay(100);
-  }
-  if (button2State == 0) {
-    Serial.println("RIGHT");
-    delay(100);
-  }
-  delay(10);
 }
