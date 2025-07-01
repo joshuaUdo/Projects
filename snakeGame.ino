@@ -16,7 +16,7 @@ struct Point {
 };
 
 Point snake[64];
-int snakeLenght = 3;
+int snakeLength = 3;
 
 int dx = 1;
 int dy = 0;
@@ -34,7 +34,7 @@ int getPixelIndex(int x, int y) {
 }
 
 void moveSnake() {
-  for (int i = snakeLenght - 1; i > 0; i--) {
+  for (int i = snakeLength - 1; i > 0; i--) {
     snake[i] = snake[i - 1];
   }
   snake[0].x += dx;
@@ -48,7 +48,7 @@ void moveSnake() {
   strip.clear();
 
   //Zeichne die Schlange
-  for (int i = 0; i < snakeLenght; i++) {
+  for (int i = 0; i < snakeLength; i++) {
     int index = getPixelIndex(snake[i].x, snake[i].y);
     strip.setPixelColor(index, strip.Color(0, 255, 0));
 
@@ -75,7 +75,7 @@ void placeFood() {
 
     valid = true;
 
-    for (int i = 0; i < snakeLenght; i++) {
+    for (int i = 0; i < snakeLength; i++) {
       if (foodx == snake[i].x && foody == snake[i].y) {
         valid = false;
         break;
@@ -94,24 +94,34 @@ void placeFood() {
 
 void eatFood() {
   if (snake[0].x == foodX && snake[0].y == foodY) {
-    snakeLenght++;
+    snakeLength++;
     placeFood();
   }
 }
 
+Point food;
+
 void collision() {
-  for (int i = 1; i < snakeLenght - 1; i++) {
+  for (int i = 1; i < snakeLength - 1; i++) {
     if (snake[i].x == snake[0].x && snake[i].y == snake[0].y) {
       drawExplosion(snake[0].x, snake[0].y);
       delay(1000);
       spawnPoint();
-      snakeLenght = 3;
+      snakeLength = 3;
       break;
     }
   }
+  // Check for collision with food
+  if (snake[0].x == food.x && snake[0].y == food.y) {
+    snakeLength++;  // Increase snake length
+    if (snakeLength > PIXELS) {
+      snakeLength = PIXELS;
+    }
+    Serial.println(snakeLength);
+    placeFood();  // Place new food
+  }
 }
-
-void drawExplosionAt(int centerX, int centerY) {
+void drawExplosion(int centerX, int centerY) {
   strip.clear();
 
   for (int radius = 0; radius <= 4; radius++) {
@@ -134,11 +144,51 @@ void drawExplosionAt(int centerX, int centerY) {
   }
 }
 
+void Left_Button() {
+  //If moving right, turn up
+  if (dx == 1 && dy == 0) {
+    dx = 0;
+    dy = -1;
+  }
+  // If moving up, turn left
+  else if (dx == 0 && dy == -1) {
+    dx = -1;
+    dy = 0;
+  }
+  // If moving left, turn down
+  else if (dx == -1 && dy == 0) {
+    dx = 0;
+    dy = 1;
+  }
+  // If moving down, turn right
+  else if (dx == 0 && dy == 1) {
+    dx = 1;
+    dy = 0;
+  }
+}
 
-// void Left_Button(){}
-// void Right_Button(){}
-// void button_function(){}
-
+void Right_Button() {
+  // If moving right, turn down
+  if (dx == 1 && dy == 0) {
+    dx = 0;
+    dy = 1;
+  }
+  // If moving down, turn left
+  else if (dx == 0 && dy == 1) {
+    dx = -1;
+    dy = 0;
+  }
+  // If moving left, turn up
+  else if (dx == -1 && dy == 0) {
+    dx = 0;
+    dy = -1;
+  }
+  // If moving up, turn rightz
+  else if (dx == 0 && dy == -1) {
+    dx = 1;
+    dy = 0;
+  }
+}
 
 void setup() {
   // put your setup code here, to run once:
@@ -167,4 +217,17 @@ void loop() {
     placeFood();
   }
   eatFood();
+
+  int buttonState = digitalRead(LEFT);
+
+  int button2State = digitalRead(RIGHT);
+  if (buttonState == 0) {
+    Serial.println("LEFT");
+    delay(100);
+  }
+  if (button2State == 0) {
+    Serial.println("RIGHT");
+    delay(100);
+  }
+  delay(10);
 }
