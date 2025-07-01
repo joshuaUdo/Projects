@@ -93,26 +93,51 @@ void placeFood() {
 }
 
 void eatFood() {
-  if(snake[0].x == foodX && snake[0].y == foodY){
+  if (snake[0].x == foodX && snake[0].y == foodY) {
     snakeLenght++;
     placeFood();
   }
 }
 
-// void collision() {
-// }
+void collision() {
+  for (int i = 1; i < snakeLenght - 1; i++) {
+    if (snake[i].x == snake[0].x && snake[i].y == snake[0].y) {
+      drawExplosion(snake[0].x, snake[0].y);
+      delay(1000);
+      spawnPoint();
+      snakeLenght = 3;
+      break;
+    }
+  }
+}
 
-// void Left_Button(){
+void drawExplosionAt(int centerX, int centerY) {
+  strip.clear();
 
-// }
+  for (int radius = 0; radius <= 4; radius++) {
+    for (int dx = -radius; dx <= radius; dx++) {
+      for (int dy = -radius; dy <= radius; dy++) {
+        int x = centerX + dx;
+        int y = centerY + dy;
+        if (abs(dx) == radius || abs(dy) == radius) {
+          if (x >= 0 && x < 8 && y >= 0 && y < 8) {
+            int index = getPixelIndex(x, y);
+            strip.setPixelColor(index, strip.Color(255, 50, 0));  // Orange-red
+          }
+        }
+      }
+    }
 
-// void Right_Button(){
+    strip.show();
+    delay(120);
+    strip.clear();
+  }
+}
 
-// }
 
-// void button_function(){  ???
-
-// }
+// void Left_Button(){}
+// void Right_Button(){}
+// void button_function(){}
 
 
 void setup() {
@@ -134,6 +159,7 @@ void loop() {
   unsigned long now = millis();
   if (now - lastmove >= moveinterval) {
     moveSnake();
+    collision();
     lastmove = now;
   }
 
