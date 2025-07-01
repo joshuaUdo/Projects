@@ -56,7 +56,6 @@ void moveSnake() {
     strip.setPixelColor(foodIndex, strip.Color(255, 255, 0));
   }
 
-
   strip.show();
 }
 
@@ -83,14 +82,23 @@ void placeFood() {
       }
     }
   }
+
   foodX = foodx;
   foodY = foody;
   lastFoodTime = millis();
 
-  int foodIndex = getPixelIndex(foodX, foody);
+  int foodIndex = getPixelIndex(foodX, foodY);
   strip.setPixelColor(foodIndex, strip.Color(255, 255, 0));
   strip.show();
 }
+
+void eatFood() {
+  if(snake[0].x == foodX && snake[0].y == foodY){
+    snakeLenght++;
+    placeFood();
+  }
+}
+
 // void collision() {
 // }
 
@@ -132,4 +140,5 @@ void loop() {
   if (millis() - lastFoodTime >= foodDuration) {
     placeFood();
   }
+  eatFood();
 }
