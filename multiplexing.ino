@@ -1,4 +1,4 @@
- int segmentPins[] = {2, 3, 4, 5, 6, 7, 8, 9};
+int segmentPins[] = {2, 3, 4, 5, 6, 7, 8, 9};
 
 int digitPins[] = {9, 10};
 
