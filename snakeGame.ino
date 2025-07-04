@@ -203,7 +203,6 @@ void setup() {
   strip.show();
 
   spawnPoint();
-  // placefood();
 }
 
 void loop() {
