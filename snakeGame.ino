@@ -62,7 +62,6 @@ void moveSnake() {
 
   strip.clear();
 
-  //Zeichne die Schlange
   for (int i = 0; i < snakeLength; i++) {
     int index = getPixelIndex(snake[i].x, snake[i].y);
     strip.setPixelColor(index, strip.Color(0, 255, 0));
@@ -132,7 +131,7 @@ void drawExplosionAt(int centerX, int centerY) {
         if (abs(dx) == radius || abs(dy) == radius) {
           if (x >= 0 && x < 8 && y >= 0 && y < 8) {
             int index = getPixelIndex(x, y);
-            strip.setPixelColor(index, strip.Color(255, 50, 0));  // Orange-red
+            strip.setPixelColor(index, strip.Color(255, 50, 0));
           }
         }
       }
@@ -142,7 +141,7 @@ void drawExplosionAt(int centerX, int centerY) {
     delay(100);
     strip.clear();
   }
-  
+
   strip.clear();
   strip.show();
 }
@@ -168,6 +167,7 @@ void Left_Button() {
     dy = 0;
   }
 }
+
 void Right_Button() {
   if (dx == 1 && dy == 0) {
     dx = 0;
@@ -235,25 +235,25 @@ void loop() {
   if (!powerState) return;
 
   if (gameOver && !gameOverHandled) {
-    drawExplosionAt(snake[0].x , snake[0].y);
+    drawExplosionAt(3, 3);
     gameOverHandled = true;
     gameOverTime = now;
     return;
   }
 
   if (gameOver && gameOverHandled && (now - gameOverTime >= 3000)) {
-  spawnPoint();
-  placeFood();
-  dx = 1;
-  dy = 0;
-  snakeLength = 3;
-  gameOver = false;
-  gameOverHandled = false;
-  return;
-}
+    spawnPoint();
+    placeFood();
+    dx = 1;
+    dy = 0;
+    snakeLength = 3;
+    gameOver = false;
+    gameOverHandled = false;
+    return;
+  }
 
-  if (!powerState) return;
-
+  if (gameOver) return;
+  
   if (now - lastmove >= moveinterval) {
     moveSnake();
     collision();
