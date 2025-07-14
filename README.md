@@ -1,3 +1,3 @@
 These are Ardunio based programs
-Each functioning based of their title names
-Also watch your wiring. have a good one.
+Each functioning based off their title
+Also watch your wiring. Have a good one.
